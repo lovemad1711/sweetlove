@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QPushButton, QLabel, QMessageBox, QStatusBar
 )
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon, QFont, QFontDatabase
 
 from ui.products_tab import ProductsTab
 from ui.initial_data_tab import InitialDataTab
@@ -41,12 +41,6 @@ class InventoryMainWindow(QMainWindow):
     def init_ui(self):
         self.setWindowTitle('술음료 재고관리 시스템')
         self.setGeometry(100, 100, 1400, 900)
-        
-        # 기본 폰트 설정
-        default_font = QFont()
-        default_font.setPointSize(10)
-        default_font.setFamily("맑은 고딕")  # Windows
-        QApplication.setFont(default_font)
         
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -296,11 +290,26 @@ def main():
     # 전역 폰트 설정
     font = QFont()
     font.setPointSize(10)
+    
     # 여러 플랫폼의 한글 폰트 시도
-    for font_family in ["맑은 고딕", "Malgun Gothic", "나눔고딕", "NanumGothic", "Apple SD Gothic Neo", "sans-serif"]:
-        font.setFamily(font_family)
-        if app.fontMetrics().inFont(font_family):
+    available_fonts = QFontDatabase().families()
+    
+    # 한글 폰트 우선순위
+    preferred_fonts = ["맑은 고딕", "Malgun Gothic", "나눔고딕", "NanumGothic", "Apple SD Gothic Neo", "Noto Sans CJK KR", "Noto Sans KR"]
+    
+    font_found = False
+    for font_family in preferred_fonts:
+        if font_family in available_fonts:
+            font.setFamily(font_family)
+            font_found = True
+            print(f"사용 폰트: {font_family}")
             break
+    
+    if not font_found:
+        # 기본 폰트 사용
+        font.setFamily("sans-serif")
+        print("기본 폰트 사용")
+    
     app.setFont(font)
     
     window = InventoryMainWindow()
