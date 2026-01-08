@@ -4,7 +4,9 @@ from PyQt5.QtWidgets import (
     QLineEdit, QHeaderView, QGroupBox, QFormLayout
 )
 from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtGui import QFont
 from datetime import datetime
+from .ui_helpers import create_table_item, get_standard_font, set_row_heights
 
 
 class WarehouseTab(QWidget):
@@ -136,17 +138,19 @@ class WarehouseTab(QWidget):
         self.table.setRowCount(len(inventory))
         
         for row, item in enumerate(reversed(inventory[-100:])):
-            self.table.setItem(row, 0, QTableWidgetItem(item['date']))
-            self.table.setItem(row, 1, QTableWidgetItem(item['product_name']))
-            self.table.setItem(row, 2, QTableWidgetItem(f"{item['boxes']:.1f}"))
+            self.table.setItem(row, 0, create_table_item(item['date']))
+            self.table.setItem(row, 1, create_table_item(item['product_name']))
+            self.table.setItem(row, 2, create_table_item(f"{item['boxes']:.1f}"))
             
             total_units = item['boxes'] * item['units_per_box']
-            self.table.setItem(row, 3, QTableWidgetItem(f"{total_units:.0f}개"))
-            self.table.setItem(row, 4, QTableWidgetItem(item.get('notes', '')))
+            self.table.setItem(row, 3, create_table_item(f"{total_units:.0f}개"))
+            self.table.setItem(row, 4, create_table_item(item.get('notes', '')))
+        
+        set_row_heights(self.table, 40)
         
         if len(inventory) == 0:
             self.table.setRowCount(1)
-            no_data = QTableWidgetItem('입고 내역이 없습니다')
-            no_data.setTextAlignment(Qt.AlignCenter)
+            no_data = create_table_item('입고 내역이 없습니다', font_size=11, align_center=True)
             self.table.setItem(0, 0, no_data)
             self.table.setSpan(0, 0, 1, 5)
+            self.table.setRowHeight(0, 60)

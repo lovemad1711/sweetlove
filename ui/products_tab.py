@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import (
     QFormLayout, QDoubleSpinBox, QSpinBox, QMessageBox, QHeaderView
 )
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont, QColor, QBrush
+from .ui_helpers import create_table_item, get_standard_font, set_row_heights
 
 
 class ProductDialog(QDialog):
@@ -17,21 +19,32 @@ class ProductDialog(QDialog):
     
     def init_ui(self):
         self.setWindowTitle('품목 추가' if not self.product else '품목 수정')
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(500)
+        self.setMinimumHeight(350)
         
         layout = QFormLayout()
         self.setLayout(layout)
         
+        # 폰트 설정
+        font = QFont()
+        font.setPointSize(10)
+        
         self.name_edit = QLineEdit()
+        self.name_edit.setFont(font)
+        self.name_edit.setMinimumHeight(30)
         layout.addRow('품목명 *:', self.name_edit)
         
         self.units_per_box_spin = QSpinBox()
+        self.units_per_box_spin.setFont(font)
+        self.units_per_box_spin.setMinimumHeight(30)
         self.units_per_box_spin.setMinimum(1)
         self.units_per_box_spin.setMaximum(1000)
         self.units_per_box_spin.setValue(20)
         layout.addRow('박스당 수량 *:', self.units_per_box_spin)
         
         self.unit_price_spin = QDoubleSpinBox()
+        self.unit_price_spin.setFont(font)
+        self.unit_price_spin.setMinimumHeight(30)
         self.unit_price_spin.setMinimum(0)
         self.unit_price_spin.setMaximum(1000000)
         self.unit_price_spin.setValue(1000)
@@ -39,16 +52,22 @@ class ProductDialog(QDialog):
         layout.addRow('개별 판매 단가 *:', self.unit_price_spin)
         
         self.notes_edit = QTextEdit()
-        self.notes_edit.setMaximumHeight(80)
+        self.notes_edit.setFont(font)
+        self.notes_edit.setMaximumHeight(100)
+        self.notes_edit.setMinimumHeight(80)
         layout.addRow('비고:', self.notes_edit)
         
         button_layout = QHBoxLayout()
         
         save_btn = QPushButton('저장' if not self.product else '수정')
+        save_btn.setFont(font)
+        save_btn.setMinimumHeight(35)
         save_btn.clicked.connect(self.accept)
         button_layout.addWidget(save_btn)
         
         cancel_btn = QPushButton('취소')
+        cancel_btn.setFont(font)
+        cancel_btn.setMinimumHeight(35)
         cancel_btn.clicked.connect(self.reject)
         cancel_btn.setStyleSheet('background-color: #95a5a6;')
         button_layout.addWidget(cancel_btn)
@@ -123,28 +142,46 @@ class ProductsTab(QWidget):
         products = self.main_window.db.get_products(active_only=True)
         
         self.table.setRowCount(len(products))
+        font = get_standard_font(10)
         
         for row, product in enumerate(products):
-            self.table.setItem(row, 0, QTableWidgetItem(product['name']))
-            self.table.setItem(row, 1, QTableWidgetItem(f"{product['units_per_box']}개"))
-            self.table.setItem(row, 2, QTableWidgetItem(f"{product['unit_price']:,.0f}원"))
-            self.table.setItem(row, 3, QTableWidgetItem(product.get('notes', '')))
+            # 품목명
+            self.table.setItem(row, 0, create_table_item(product['name']))
             
+            # 박스당 수량
+            self.table.setItem(row, 1, create_table_item(f"{product['units_per_box']}개"))
+            
+            # 단가
+            self.table.setItem(row, 2, create_table_item(f"{product['unit_price']:,.0f}원"))
+            
+            # 비고
+            self.table.setItem(row, 3, create_table_item(product.get('notes', '')))
+            
+            # 수정 버튼
             edit_btn = QPushButton('수정')
+            edit_btn.setFont(font)
+            edit_btn.setMinimumHeight(30)
             edit_btn.clicked.connect(lambda checked, p=product: self.edit_product(p))
             self.table.setCellWidget(row, 4, edit_btn)
             
+            # 삭제 버튼
             delete_btn = QPushButton('삭제')
-            delete_btn.setStyleSheet('background-color: #e74c3c;')
+            delete_btn.setFont(font)
+            delete_btn.setMinimumHeight(30)
+            delete_btn.setStyleSheet('background-color: #e74c3c; color: white; font-weight: bold;')
             delete_btn.clicked.connect(lambda checked, p=product: self.delete_product(p))
             self.table.setCellWidget(row, 5, delete_btn)
         
+        # 행 높이 설정
+        set_row_heights(self.table, 45)
+        
         if len(products) == 0:
             self.table.setRowCount(1)
-            no_data_item = QTableWidgetItem('등록된 품목이 없습니다')
-            no_data_item.setTextAlignment(Qt.AlignCenter)
+            no_data_item = create_table_item('등록된 품목이 없습니다', font_size=11, align_center=True)
+            no_data_item.setForeground(QBrush(QColor(120, 120, 120)))
             self.table.setItem(0, 0, no_data_item)
             self.table.setSpan(0, 0, 1, 6)
+            self.table.setRowHeight(0, 60)
     
     def add_product(self):
         dialog = ProductDialog(self)

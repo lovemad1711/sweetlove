@@ -42,6 +42,12 @@ class InventoryMainWindow(QMainWindow):
         self.setWindowTitle('술음료 재고관리 시스템')
         self.setGeometry(100, 100, 1400, 900)
         
+        # 기본 폰트 설정
+        default_font = QFont()
+        default_font.setPointSize(10)
+        default_font.setFamily("맑은 고딕")  # Windows
+        QApplication.setFont(default_font)
+        
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         
@@ -139,6 +145,7 @@ class InventoryMainWindow(QMainWindow):
         self.setStyleSheet("""
             QMainWindow {
                 background-color: #f5f5f5;
+                font-size: 11pt;
             }
             QTabWidget::pane {
                 border: 1px solid #ddd;
@@ -152,6 +159,8 @@ class InventoryMainWindow(QMainWindow):
                 margin-right: 2px;
                 border-top-left-radius: 5px;
                 border-top-right-radius: 5px;
+                font-size: 11pt;
+                font-weight: bold;
             }
             QTabBar::tab:selected {
                 background-color: #3498db;
@@ -168,6 +177,8 @@ class InventoryMainWindow(QMainWindow):
                 padding: 8px 16px;
                 border-radius: 4px;
                 font-weight: bold;
+                font-size: 10pt;
+                min-height: 25px;
             }
             QPushButton:hover {
                 background-color: #2980b9;
@@ -182,9 +193,12 @@ class InventoryMainWindow(QMainWindow):
                 border: 1px solid #ddd;
                 gridline-color: #e0e0e0;
                 background-color: white;
+                color: #000000;
+                font-size: 10pt;
             }
             QTableWidget::item {
-                padding: 5px;
+                padding: 8px;
+                color: #000000;
             }
             QTableWidget::item:selected {
                 background-color: #3498db;
@@ -193,21 +207,58 @@ class InventoryMainWindow(QMainWindow):
             QHeaderView::section {
                 background-color: #34495e;
                 color: white;
-                padding: 8px;
+                padding: 10px;
                 border: none;
                 font-weight: bold;
+                font-size: 10pt;
             }
-            QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QDateEdit {
+            QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QDateEdit, QTextEdit {
                 padding: 6px;
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 background-color: white;
+                color: #000000;
+                font-size: 10pt;
+                min-height: 25px;
             }
-            QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QDateEdit:focus {
+            QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QDateEdit:focus, QTextEdit:focus {
                 border: 2px solid #3498db;
             }
             QLabel {
                 color: #2c3e50;
+                font-size: 10pt;
+            }
+            QComboBox::drop-down {
+                border: none;
+                width: 20px;
+            }
+            QComboBox::down-arrow {
+                image: none;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 5px solid #333;
+            }
+            QSpinBox::up-button, QSpinBox::down-button,
+            QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+                width: 20px;
+            }
+            QCheckBox {
+                font-size: 10pt;
+                color: #2c3e50;
+            }
+            QGroupBox {
+                font-size: 11pt;
+                font-weight: bold;
+                color: #2c3e50;
+                border: 2px solid #ddd;
+                border-radius: 5px;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
             }
         """)
     
@@ -239,7 +290,18 @@ class InventoryMainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     
+    # 스타일 설정
     app.setStyle('Fusion')
+    
+    # 전역 폰트 설정
+    font = QFont()
+    font.setPointSize(10)
+    # 여러 플랫폼의 한글 폰트 시도
+    for font_family in ["맑은 고딕", "Malgun Gothic", "나눔고딕", "NanumGothic", "Apple SD Gothic Neo", "sans-serif"]:
+        font.setFamily(font_family)
+        if app.fontMetrics().inFont(font_family):
+            break
+    app.setFont(font)
     
     window = InventoryMainWindow()
     window.show()
