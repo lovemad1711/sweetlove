@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}연간 보고서 - 술음료 재고관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>연간 판매 분석 보고서</h1>
+</div>
+
+<form method="GET" class="filter-form">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="year">연도</label>
+            <input type="number" id="year" name="year" value="{{ report.year }}" min="2020" max="2100">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-secondary">조회</button>
+        </div>
+    </div>
+</form>
+
+<div class="report-summary">
+    <h2>{{ report.year }}년 연간 보고서</h2>
+    
+    <div class="summary-cards">
+        <div class="summary-card">
+            <h3>예측 판매</h3>
+            <p class="big-number">{{ "{:,}".format(report.total_predicted_sales) }}개</p>
+        </div>
+        <div class="summary-card">
+            <h3>실제 판매</h3>
+            <p class="big-number">{{ "{:,}".format(report.total_actual_sales) }}개</p>
+        </div>
+        <div class="summary-card {% if report.total_discrepancy_units > 0 %}negative{% elif report.total_discrepancy_units < 0 %}positive{% endif %}">
+            <h3>차이</h3>
+            <p class="big-number">{{ "{:,}".format(report.total_discrepancy_units) }}개</p>
+        </div>
+        <div class="summary-card {% if report.total_discrepancy_value > 0 %}negative{% elif report.total_discrepancy_value < 0 %}positive{% endif %}">
+            <h3>금액 차이</h3>
+            <p class="big-number">{{ "{:,.0f}".format(report.total_discrepancy_value) }}원</p>
+        </div>
+    </div>
+</div>
+
+{% if chart_filename %}
+<div class="chart-section">
+    <h2>월별 판매 추이</h2>
+    <img src="{{ url_for('static', filename='charts/' + chart_filename) }}" alt="연간 판매 비교">
+</div>
+{% endif %}
+
+<div class="data-section">
+    <h2>월별 분석</h2>
+    
+    {% if report.months %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>월</th>
+                <th>예측 판매</th>
+                <th>실제 판매</th>
+                <th>차이 (개)</th>
+                <th>차이 (금액)</th>
+                <th>상세</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for month in report.months %}
+            <tr class="{% if month.total_discrepancy_units > 0 %}row-negative{% elif month.total_discrepancy_units < 0 %}row-positive{% endif %}">
+                <td><strong>{{ month.month }}월</strong></td>
+                <td>{{ "{:,}".format(month.total_predicted_sales) }}개</td>
+                <td>{{ "{:,}".format(month.total_actual_sales) }}개</td>
+                <td>{{ "{:,}".format(month.total_discrepancy_units) }}개</td>
+                <td>{{ "{:,.0f}".format(month.total_discrepancy_value) }}원</td>
+                <td>
+                    <a href="{{ url_for('monthly_report', year=report.year, month=month.month) }}" class="btn btn-small">상세보기</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-message">분석할 데이터가 없습니다.</p>
+    {% endif %}
+</div>
+{% endblock %}

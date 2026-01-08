@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}홈 - 술음료 재고관리 시스템{% endblock %}
+
+{% block content %}
+<div class="welcome-section">
+    <h1>술음료 재고관리 시스템</h1>
+    <p>술과 음료의 재고를 효율적으로 관리하는 시스템입니다.</p>
+</div>
+
+<div class="dashboard-cards">
+    <div class="card">
+        <h3>품목관리</h3>
+        <p>술과 음료 품목을 추가, 수정, 삭제합니다.</p>
+        <a href="{{ url_for('products') }}" class="btn btn-primary">관리하기</a>
+    </div>
+
+    <div class="card">
+        <h3>초기데이터 설정</h3>
+        <p>재고의 시작점이 되는 초기 데이터를 설정합니다.</p>
+        <a href="{{ url_for('initial_data') }}" class="btn btn-primary">설정하기</a>
+    </div>
+
+    <div class="card">
+        <h3>쇼케이스 설정</h3>
+        <p>각 쇼케이스의 최대 용량과 사용 품목을 설정합니다.</p>
+        <a href="{{ url_for('showcase_config') }}" class="btn btn-primary">설정하기</a>
+    </div>
+
+    <div class="card">
+        <h3>데이터 입력</h3>
+        <p>입고, 출고, 쇼케이스, 판매 데이터를 입력합니다.</p>
+        <a href="{{ url_for('warehouse') }}" class="btn btn-primary">입력하기</a>
+    </div>
+
+    <div class="card">
+        <h3>재고 현황</h3>
+        <p>현재 창고와 쇼케이스의 재고 상태를 확인합니다.</p>
+        <a href="{{ url_for('inventory_summary') }}" class="btn btn-primary">확인하기</a>
+    </div>
+
+    <div class="card">
+        <h3>분석 보고서</h3>
+        <p>주간, 월간, 연간 판매 분석을 확인합니다.</p>
+        <a href="{{ url_for('weekly_report') }}" class="btn btn-primary">보기</a>
+    </div>
+
+    <div class="card">
+        <h3>백업 관리</h3>
+        <p>데이터를 백업하고 복원합니다.</p>
+        <a href="{{ url_for('backups') }}" class="btn btn-primary">관리하기</a>
+    </div>
+</div>
+
+<div class="info-section">
+    <h2>시스템 사용 안내</h2>
+    <ol>
+        <li><strong>품목관리:</strong> 먼저 판매할 술과 음료 품목을 등록합니다.</li>
+        <li><strong>쇼케이스 설정:</strong> 각 쇼케이스의 최대 용량을 설정합니다.</li>
+        <li><strong>초기데이터:</strong> 현재 보유중인 재고의 초기값을 설정합니다.</li>
+        <li><strong>일일 운영:</strong> 입고, 출고, 판매 데이터를 매일 입력합니다.</li>
+        <li><strong>분석:</strong> 주간, 월간 단위로 판매 차이를 분석합니다.</li>
+        <li><strong>백업:</strong> 정기적으로 데이터를 백업합니다.</li>
+    </ol>
+</div>
+{% endblock %}

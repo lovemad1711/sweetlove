@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}쇼케이스 이동 - 술음료 재고관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>쇼케이스 간 이동</h1>
+</div>
+
+<div class="info-box">
+    <p><strong>안내:</strong> 한 쇼케이스에서 다른 쇼케이스로 재고를 이동합니다.</p>
+</div>
+
+<form method="POST" class="form">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="date">날짜 *</label>
+            <input type="date" id="date" name="date" required>
+        </div>
+
+        <div class="form-group">
+            <label for="product_id">품목 *</label>
+            <select id="product_id" name="product_id" required>
+                <option value="">선택하세요</option>
+                {% for product in products %}
+                <option value="{{ product.id }}">{{ product.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="from_showcase">출발 쇼케이스 *</label>
+            <select id="from_showcase" name="from_showcase" required>
+                <option value="">선택하세요</option>
+                {% for i in range(1, 6) %}
+                <option value="{{ i }}">쇼케이스 {{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="to_showcase">도착 쇼케이스 *</label>
+            <select id="to_showcase" name="to_showcase" required>
+                <option value="">선택하세요</option>
+                {% for i in range(1, 6) %}
+                <option value="{{ i }}">쇼케이스 {{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="units">이동 수량 (개) *</label>
+        <input type="number" id="units" name="units" min="1" required>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">이동</button>
+    </div>
+</form>
+{% endblock %}

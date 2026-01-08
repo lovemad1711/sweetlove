@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}백업 관리 - 술음료 재고관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>백업 관리</h1>
+</div>
+
+<div class="info-box">
+    <p><strong>안내:</strong> 데이터를 정기적으로 백업하여 안전하게 보관합니다. 백업 파일은 5년간 보관되며, 이후 영구 보관함으로 이동됩니다.</p>
+</div>
+
+<div class="form-card">
+    <h2>새 백업 생성</h2>
+    <form method="POST" action="{{ url_for('create_backup') }}" class="form">
+        <div class="form-group">
+            <label for="notes">백업 메모</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="백업 사유나 특이사항을 입력하세요"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" onclick="return confirm('백업을 생성하시겠습니까?');">백업 생성</button>
+        </div>
+    </form>
+</div>
+
+<div class="data-section">
+    <h2>백업 목록</h2>
+    
+    {% if backups %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>백업 파일명</th>
+                <th>생성일시</th>
+                <th>파일 크기</th>
+                <th>메모</th>
+                <th>관리</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for backup in backups %}
+            <tr>
+                <td>{{ backup.filename }}</td>
+                <td>{{ backup.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ "%.2f"|format(backup.size / 1024) }} KB</td>
+                <td>{{ backup.notes }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('restore_backup', filename=backup.filename) }}" style="display:inline;" onsubmit="return confirm('이 백업으로 복원하시겠습니까? 현재 데이터는 덮어씌워집니다.');">
+                        <button type="submit" class="btn btn-small">복원</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('archive_backup', filename=backup.filename) }}" style="display:inline;" onsubmit="return confirm('이 백업을 영구 보관함으로 이동하시겠습니까?');">
+                        <button type="submit" class="btn btn-small btn-secondary">영구보관</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-message">백업 파일이 없습니다.</p>
+    {% endif %}
+</div>
+
+<div class="info-section">
+    <h3>백업 관리 안내</h3>
+    <ul>
+        <li><strong>백업 생성:</strong> 현재 데이터베이스의 복사본을 생성합니다.</li>
+        <li><strong>복원:</strong> 선택한 백업 파일로 데이터베이스를 복원합니다.</li>
+        <li><strong>영구 보관:</strong> 5년이 지난 백업을 영구 보관함으로 이동합니다.</li>
+        <li><strong>보관 기간:</strong> 백업 파일은 기본적으로 5년간 보관됩니다.</li>
+        <li>중요한 시점(월말, 연말 등)에는 반드시 백업을 생성하세요.</li>
+    </ul>
+</div>
+{% endblock %}
