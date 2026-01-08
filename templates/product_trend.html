@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} 판매 추이 - 술음료 재고관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ product.name }} 판매 추이</h1>
+    <a href="{{ url_for('products') }}" class="btn btn-secondary">품목 목록</a>
+</div>
+
+<form method="GET" class="filter-form">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="months">조회 기간 (개월)</label>
+            <select id="months" name="months">
+                <option value="3" {% if months == 3 %}selected{% endif %}>3개월</option>
+                <option value="6" {% if months == 6 %}selected{% endif %}>6개월</option>
+                <option value="12" {% if months == 12 %}selected{% endif %}>12개월</option>
+                <option value="24" {% if months == 24 %}selected{% endif %}>24개월</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-secondary">조회</button>
+        </div>
+    </div>
+</form>
+
+{% if chart_filename %}
+<div class="chart-section">
+    <h2>{{ months }}개월 판매 추이</h2>
+    <img src="{{ url_for('static', filename='charts/' + chart_filename) }}" alt="{{ product.name }} 판매 추이">
+</div>
+{% else %}
+<p class="empty-message">차트를 생성할 수 없습니다.</p>
+{% endif %}
+
+<div class="info-section">
+    <h3>품목 정보</h3>
+    <ul>
+        <li><strong>품목명:</strong> {{ product.name }}</li>
+        <li><strong>박스당 수량:</strong> {{ product.units_per_box }}개</li>
+        <li><strong>단가:</strong> {{ "{:,.0f}".format(product.unit_price) }}원</li>
+        <li><strong>비고:</strong> {{ product.notes if product.notes else '없음' }}</li>
+    </ul>
+</div>
+{% endblock %}

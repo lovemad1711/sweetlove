@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}주간 보고서 - 술음료 재고관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>주간 판매 분석 보고서</h1>
+</div>
+
+<form method="GET" class="filter-form">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="start_date">주 시작일 (월요일)</label>
+            <input type="date" id="start_date" name="start_date" value="{{ report.start_date }}">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-secondary">조회</button>
+        </div>
+    </div>
+</form>
+
+<div class="report-summary">
+    <h2>{{ report.start_date }} ~ {{ report.end_date }}</h2>
+    
+    <div class="summary-cards">
+        <div class="summary-card">
+            <h3>예측 판매</h3>
+            <p class="big-number">{{ report.total_predicted_sales }}개</p>
+        </div>
+        <div class="summary-card">
+            <h3>실제 판매</h3>
+            <p class="big-number">{{ report.total_actual_sales }}개</p>
+        </div>
+        <div class="summary-card {% if report.total_discrepancy_units > 0 %}negative{% elif report.total_discrepancy_units < 0 %}positive{% endif %}">
+            <h3>차이</h3>
+            <p class="big-number">{{ report.total_discrepancy_units }}개</p>
+        </div>
+        <div class="summary-card {% if report.total_discrepancy_value > 0 %}negative{% elif report.total_discrepancy_value < 0 %}positive{% endif %}">
+            <h3>금액 차이</h3>
+            <p class="big-number">{{ "{:,.0f}".format(report.total_discrepancy_value) }}원</p>
+        </div>
+    </div>
+</div>
+
+{% if chart_filename %}
+<div class="chart-section">
+    <h2>예측 vs 실제 판매 비교</h2>
+    <img src="{{ url_for('static', filename='charts/' + chart_filename) }}" alt="주간 판매 비교">
+</div>
+{% endif %}
+
+{% if discrepancy_chart %}
+<div class="chart-section">
+    <h2>품목별 판매 차이</h2>
+    <img src="{{ url_for('static', filename='charts/' + discrepancy_chart) }}" alt="판매 차이 분석">
+</div>
+{% endif %}
+
+<div class="data-section">
+    <h2>품목별 상세 분석</h2>
+    
+    {% if report.products %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>품목명</th>
+                <th>예측 판매</th>
+                <th>실제 판매</th>
+                <th>차이 (개)</th>
+                <th>차이 (금액)</th>
+                <th>차이율</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in report.products %}
+            <tr class="{% if product.discrepancy_units > 0 %}row-negative{% elif product.discrepancy_units < 0 %}row-positive{% endif %}">
+                <td><strong>{{ product.product_name }}</strong></td>
+                <td>{{ product.predicted_sales }}개</td>
+                <td>{{ product.actual_sales }}개</td>
+                <td>{{ product.discrepancy_units }}개</td>
+                <td>{{ "{:,.0f}".format(product.discrepancy_value) }}원</td>
+                <td>
+                    {% if product.predicted_sales > 0 %}
+                    {{ "%.1f"|format((product.discrepancy_units / product.predicted_sales) * 100) }}%
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-message">분석할 데이터가 없습니다.</p>
+    {% endif %}
+</div>
+
+<div class="info-section">
+    <h3>분석 안내</h3>
+    <ul>
+        <li><strong>예측 판매:</strong> 출고량을 기반으로 계산된 예상 판매량</li>
+        <li><strong>실제 판매:</strong> 실제 판매 데이터</li>
+        <li><strong>차이:</strong> 예측 판매 - 실제 판매 (양수: 손실, 음수: 추가 판매)</li>
+        <li>차이가 큰 경우 재고 파악 또는 판매 데이터 입력을 확인하세요.</li>
+    </ul>
+</div>
+{% endblock %}

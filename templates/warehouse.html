@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}입고 관리 - 술음료 재고관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>입고 관리</h1>
+</div>
+
+<div class="form-card">
+    <h2>입고 데이터 입력</h2>
+    <form method="POST" class="form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="date">날짜 *</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="product_id">품목 *</label>
+                <select id="product_id" name="product_id" required>
+                    <option value="">선택하세요</option>
+                    {% for product in products %}
+                    <option value="{{ product.id }}">{{ product.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="boxes">박스 수량 *</label>
+                <input type="number" id="boxes" name="boxes" min="0" step="0.1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">비고</label>
+                <input type="text" id="notes" name="notes">
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">입고 등록</button>
+        </div>
+    </form>
+</div>
+
+<div class="data-section">
+    <h2>입고 내역</h2>
+    
+    <form method="GET" class="filter-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="start_date">시작일</label>
+                <input type="date" id="start_date" name="start_date" value="{{ request.args.get('start_date', '') }}">
+            </div>
+            <div class="form-group">
+                <label for="end_date">종료일</label>
+                <input type="date" id="end_date" name="end_date" value="{{ request.args.get('end_date', '') }}">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-secondary">조회</button>
+            </div>
+        </div>
+    </form>
+
+    {% if inventory %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>날짜</th>
+                <th>품목명</th>
+                <th>박스 수량</th>
+                <th>개수 (환산)</th>
+                <th>비고</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in inventory %}
+            <tr>
+                <td>{{ item.date }}</td>
+                <td>{{ item.product_name }}</td>
+                <td>{{ item.boxes }}</td>
+                <td>{{ item.boxes * item.units_per_box }}</td>
+                <td>{{ item.notes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-message">입고 내역이 없습니다.</p>
+    {% endif %}
+</div>
+{% endblock %}

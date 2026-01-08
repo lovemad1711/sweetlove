@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}품목관리 - 술음료 재고관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>품목 관리</h1>
+    <a href="{{ url_for('add_product') }}" class="btn btn-primary">품목 추가</a>
+</div>
+
+{% if products %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>품목명</th>
+            <th>박스당 수량</th>
+            <th>단가</th>
+            <th>비고</th>
+            <th>관리</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.units_per_box }}개</td>
+            <td>{{ "{:,.0f}".format(product.unit_price) }}원</td>
+            <td>{{ product.notes }}</td>
+            <td>
+                <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-small">수정</a>
+                <form method="POST" action="{{ url_for('delete_product', product_id=product.id) }}" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <button type="submit" class="btn btn-small btn-danger">삭제</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <p>등록된 품목이 없습니다.</p>
+    <a href="{{ url_for('add_product') }}" class="btn btn-primary">첫 품목 추가하기</a>
+</div>
+{% endif %}
+{% endblock %}
