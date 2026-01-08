@@ -1,8 +1,11 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget,
-    QTableWidgetItem, QLabel, QHeaderView, QSpinBox, QCheckBox, QGroupBox
+    QTableWidgetItem, QLabel, QHeaderView, QSpinBox, QCheckBox, QGroupBox,
+    QScrollArea
 )
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
+from .ui_helpers import create_table_item, get_standard_font, set_row_heights
 
 
 class ShowcaseConfigTab(QWidget):
@@ -40,10 +43,21 @@ class ShowcaseConfigTab(QWidget):
         info_label.setStyleSheet('padding: 10px; background-color: #e3f2fd; border-radius: 5px;')
         layout.addWidget(info_label)
         
+        # 스크롤 영역 생성
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        
+        # 스크롤 컨텐츠 위젯
+        scroll_content = QWidget()
+        scroll_layout = QVBoxLayout()
+        scroll_content.setLayout(scroll_layout)
+        
         self.tables = {}
         
         for showcase_num in range(1, 6):
             group = QGroupBox(f'쇼케이스 {showcase_num}')
+            group.setStyleSheet('QGroupBox { font-size: 13pt; font-weight: bold; padding: 15px; }')
             group_layout = QVBoxLayout()
             group.setLayout(group_layout)
             
@@ -57,31 +71,43 @@ class ShowcaseConfigTab(QWidget):
             header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
             
             table.setColumnHidden(3, True)
-            table.setMaximumHeight(200)
+            # 최대 높이 제한 제거하여 모든 행이 보이도록 함
+            # table.setMaximumHeight(200)  # 제거
             
             group_layout.addWidget(table)
-            layout.addWidget(group)
+            scroll_layout.addWidget(group)
             
             self.tables[showcase_num] = table
+        
+        scroll.setWidget(scroll_content)
+        layout.addWidget(scroll)
         
         self.load_config()
     
     def load_config(self):
         products = self.main_window.db.get_products(active_only=True)
         configs = self.main_window.db.get_all_showcase_configs()
+        font = get_standard_font(10)
         
         for showcase_num, table in self.tables.items():
             table.setRowCount(len(products))
             
             for row, product in enumerate(products):
-                table.setItem(row, 0, QTableWidgetItem(product['name']))
+                # 품목명
+                name_item = create_table_item(product['name'])
+                table.setItem(row, 0, name_item)
                 
+                # 최대 용량
                 capacity_spin = QSpinBox()
+                capacity_spin.setFont(font)
                 capacity_spin.setMinimum(0)
                 capacity_spin.setMaximum(10000)
+                capacity_spin.setMinimumHeight(35)
+                capacity_spin.setAlignment(Qt.AlignCenter)
                 
+                # 사용 체크박스
                 checkbox = QCheckBox()
-                checkbox.setStyleSheet('margin-left: 20px;')
+                checkbox.setStyleSheet('margin-left: 20px; font-size: 10pt;')
                 
                 if showcase_num in configs and product['id'] in configs[showcase_num]:
                     config = configs[showcase_num][product['id']]
@@ -94,6 +120,9 @@ class ShowcaseConfigTab(QWidget):
                 table.setCellWidget(row, 1, capacity_spin)
                 table.setCellWidget(row, 2, checkbox)
                 table.setItem(row, 3, QTableWidgetItem(str(product['id'])))
+            
+            # 행 높이 설정
+            set_row_heights(table, 45)
     
     def save_config(self):
         try:

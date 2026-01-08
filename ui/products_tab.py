@@ -160,15 +160,17 @@ class ProductsTab(QWidget):
             # 수정 버튼
             edit_btn = QPushButton('수정')
             edit_btn.setFont(font)
-            edit_btn.setMinimumHeight(30)
+            edit_btn.setMinimumHeight(35)
+            edit_btn.setMinimumWidth(70)
             edit_btn.clicked.connect(lambda checked, p=product: self.edit_product(p))
             self.table.setCellWidget(row, 4, edit_btn)
             
             # 삭제 버튼
             delete_btn = QPushButton('삭제')
             delete_btn.setFont(font)
-            delete_btn.setMinimumHeight(30)
-            delete_btn.setStyleSheet('background-color: #e74c3c; color: white; font-weight: bold;')
+            delete_btn.setMinimumHeight(35)
+            delete_btn.setMinimumWidth(70)
+            delete_btn.setStyleSheet('background-color: #e74c3c; color: white; font-weight: bold; font-size: 10pt;')
             delete_btn.clicked.connect(lambda checked, p=product: self.delete_product(p))
             self.table.setCellWidget(row, 5, delete_btn)
         

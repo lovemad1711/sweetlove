@@ -4,7 +4,9 @@ from PyQt5.QtWidgets import (
     QSpinBox, QLineEdit
 )
 from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtGui import QFont
 from datetime import datetime
+from .ui_helpers import create_table_item, get_standard_font, set_row_heights
 
 
 class InitialDataTab(QWidget):
@@ -70,33 +72,51 @@ class InitialDataTab(QWidget):
         products = self.main_window.db.get_products(active_only=True)
         
         self.table.setRowCount(len(products))
+        font = get_standard_font(10)
         
         for row, product in enumerate(products):
-            self.table.setItem(row, 0, QTableWidgetItem(product['name']))
+            # 품목명
+            name_item = create_table_item(product['name'])
+            self.table.setItem(row, 0, name_item)
             
+            # 창고 (박스)
             warehouse_spin = QDoubleSpinBox()
+            warehouse_spin.setFont(font)
             warehouse_spin.setMinimum(0)
             warehouse_spin.setMaximum(10000)
             warehouse_spin.setSingleStep(0.5)
+            warehouse_spin.setMinimumHeight(35)
+            warehouse_spin.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(row, 1, warehouse_spin)
             
+            # 쇼케이스 1-5
             for col in range(2, 7):
                 showcase_spin = QSpinBox()
+                showcase_spin.setFont(font)
                 showcase_spin.setMinimum(0)
                 showcase_spin.setMaximum(10000)
+                showcase_spin.setMinimumHeight(35)
+                showcase_spin.setAlignment(Qt.AlignCenter)
                 self.table.setCellWidget(row, col, showcase_spin)
             
+            # 비고
             notes_edit = QLineEdit()
+            notes_edit.setFont(font)
+            notes_edit.setMinimumHeight(35)
             self.table.setCellWidget(row, 7, notes_edit)
             
+            # ID (숨김)
             self.table.setItem(row, 8, QTableWidgetItem(str(product['id'])))
+        
+        # 행 높이 설정
+        set_row_heights(self.table, 45)
         
         if len(products) == 0:
             self.table.setRowCount(1)
-            no_data = QTableWidgetItem('먼저 품목을 등록해주세요')
-            no_data.setTextAlignment(Qt.AlignCenter)
+            no_data = create_table_item('먼저 품목을 등록해주세요', font_size=11, align_center=True)
             self.table.setItem(0, 0, no_data)
             self.table.setSpan(0, 0, 1, 8)
+            self.table.setRowHeight(0, 60)
     
     def save_initial_data(self):
         date = self.date_edit.date().toString('yyyy-MM-dd')

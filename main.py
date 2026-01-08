@@ -149,12 +149,13 @@ class InventoryMainWindow(QMainWindow):
             QTabBar::tab {
                 background-color: #e0e0e0;
                 color: #333;
-                padding: 10px 20px;
+                padding: 12px 25px;
                 margin-right: 2px;
                 border-top-left-radius: 5px;
                 border-top-right-radius: 5px;
-                font-size: 11pt;
+                font-size: 12pt;
                 font-weight: bold;
+                min-width: 100px;
             }
             QTabBar::tab:selected {
                 background-color: #3498db;
